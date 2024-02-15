@@ -1,0 +1,61 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                Statistic Arrow.mq5|
+//|                                Copyright 2022, Forex Robot Easy Team|
+//|                                             https://forexroboteasy.com|
+//+------------------------------------------------------------------+
+
+#property copyright 'Copyright 2022, Forex Robot Easy Team'
+#property link      'https://forexroboteasy.com'
+#property version   '1.00'
+#property strict
+
+input int fastMA_Period = 10;   // Period for fast moving average
+input int mediumMA_Period = 20; // Period for medium moving average
+input int slowMA_Period = 50;   // Period for slow moving average
+
+int OnInit()
+{
+    // Add indicators to the chart
+    if (!ChartIndicatorAdd(0, ChartGetInteger(0, CHART_HEIGHT_IN_PIXELS) - 100, iMA, SYMBOL(), PERIOD_CURRENT, fastMA_Period, 0, MODE_SMA, PRICE_CLOSE))
+    {
+        Print('Failed to add fast moving average to the chart! Error code:', GetLastError());
+        return INIT_FAILED;
+    }
+    
+    if (!ChartIndicatorAdd(0, ChartGetInteger(0, CHART_HEIGHT_IN_PIXELS) - 100, iMA, SYMBOL(), PERIOD_CURRENT, mediumMA_Period, 0, MODE_SMA, PRICE_CLOSE))
+    {
+        Print('Failed to add medium moving average to the chart! Error code:', GetLastError());
+        return INIT_FAILED;
+    }
+    
+    if (!ChartIndicatorAdd(0, ChartGetInteger(0, CHART_HEIGHT_IN_PIXELS) - 100, iMA, SYMBOL(), PERIOD_CURRENT, slowMA_Period, 0, MODE_SMA, PRICE_CLOSE))
+    {
+        Print('Failed to add slow moving average to the chart! Error code:', GetLastError());
+        return INIT_FAILED;
+    }
+    
+    return INIT_SUCCEEDED;
+}
+
+void OnTick()
+{
+    double fastMA = iMA(SYMBOL(), PERIOD_CURRENT, fastMA_Period, 0, MODE_SMA, PRICE_CLOSE, 0);
+    double mediumMA = iMA(SYMBOL(), PERIOD_CURRENT, mediumMA_Period, 0, MODE_SMA, PRICE_CLOSE, 0);
+    double slowMA = iMA(SYMBOL(), PERIOD_CURRENT, slowMA_Period, 0, MODE_SMA, PRICE_CLOSE, 0);
+    
+    if (fastMA > mediumMA && mediumMA > slowMA)
+    {
+        // Generate buy signal
+        Print('Buy signal generated!');
+        ChartRedraw();
+    }
+    else if (fastMA < mediumMA && mediumMA < slowMA)
+    {
+        // Generate sell signal
+        Print('Sell signal generated!');
+        ChartRedraw();
+    }
+}
+
+//+------------------------------------------------------------------+
